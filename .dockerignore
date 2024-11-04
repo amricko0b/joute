@@ -5,5 +5,9 @@
 .idea
 
 # Binaries
-./joute
+joute
 build
+
+.gitignore
+Readme.md
+Dockerfile

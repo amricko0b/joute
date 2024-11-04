@@ -1,0 +1,14 @@
+{
+    "jsonrpc": "2.0",
+    "id": "1130ac93-2d76-49e1-bc32-7787436d81be",
+    "method": "primarch.create",
+    "params": {
+        "primarch": {
+            "name": "Mortarion"
+        },
+        "wargear": [
+            "Silence",
+            "TheLantern"
+        ]
+    }
+}

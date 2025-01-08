@@ -18,10 +18,10 @@ Acts like a proxy and sets following HTTP headers according to request:
 
 ## Roadmap
 - [x] Utility headers (MVP I guess...)
-- [] By-Method target endpoint selection
-- [] Gateway functionality (By-Method routing?)
-- [] JSON-RPC request -> JSON request (extract params)
-- [] JSON response -> JSON-RPC response (result and error insertion)
+- [ ] By-Method target endpoint selection
+- [ ] Gateway functionality (By-Method routing?)
+- [ ] JSON-RPC request -> JSON request (extract params)
+- [ ] JSON response -> JSON-RPC response (result and error insertion)
 
 ## Building
 

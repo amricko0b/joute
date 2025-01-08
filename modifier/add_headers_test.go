@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/amricko0b/joute/jsonrpc"
@@ -14,7 +13,7 @@ import (
 func TestHeadersAreAdded(t *testing.T) {
 	request := http.Request{Header: make(http.Header)}
 	call := jsonrpc.Request{
-		Id:     uuid.NewString(),
+		Id:     "1c00e253-deab-4c11-87af-c6f8f14fd338",
 		Method: "do_something",
 	}
 

@@ -1,0 +1,41 @@
+{
+    "downstreams": {
+        "legions": {
+            "address": "https://legions.svc"
+        },
+        "primarchs": {
+            "address": "https://primarchs.svc:443"
+        }
+    },
+    "endpoints": {
+        "/api/v1/primarch/jsonrpc": {
+            "routing": "direct",
+            "redirectTo": "primarches",
+            "request": {
+                "message": "asIs",
+                "addHeaders": [
+                    "X-Rpc-Method"
+                ]
+            },
+            "response": {
+                "message": "asIs"
+            },
+            "methods": [
+                {
+                    "name": "get_primarch",
+                    "routing": "useMethod",
+                    "request": {
+                        "message": "shrink",
+                        "addHeaders": [
+                            "X-Rpc-Method",
+                            "X-Rpc-Id"
+                        ]
+                    },
+                    "response": {
+                        "message": "expand"
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -1,23 +1,32 @@
 package joute
 
 import (
-	"encoding/json"
+	"io"
 	"os"
+	"path/filepath"
 )
 
-// Used for testing purposes only - will be deleted
-type ConfigMap map[string]any
+// ConfigFileSource represents a generic source from where the config will be loaded
+type ConfigFileSource interface {
+	Reader() (io.Reader, error)
+}
 
-// Used for testing purposes only - will be deleted
-func LoadConfigMap() (ConfigMap, error) {
+// All sources supported by Joute
+type (
+	ConfigFileLocation string
+	WorkingDirectory   struct{}
+)
 
-	var configMap ConfigMap
+// Configuration file defaults
+const (
+	DefaultConfigFileName     = ".jouterc"
+	DefaultConfigFileLocation = "."
+)
 
-	if file, err := os.Open("./configs/.jouterc"); err == nil {
-		err = json.NewDecoder(file).Decode(&configMap)
-		return configMap, err
-	} else {
-		return nil, err
-	}
+func (loc ConfigFileLocation) Reader() (io.Reader, error) {
+	return os.Open(filepath.Join(string(loc), DefaultConfigFileName))
+}
 
+func (dir WorkingDirectory) Reader() (io.Reader, error) {
+	return os.Open(filepath.Join(".", DefaultConfigFileName))
 }

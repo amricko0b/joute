@@ -1,4 +1,5 @@
 {
+    "port": 9000,
     "downstreams": {
         "legions": {
             "address": "https://legions.svc"

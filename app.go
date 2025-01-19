@@ -8,7 +8,8 @@ import (
 
 // A must be loaded to start Joute
 type App struct {
-	Port int
+	Port        int
+	Downstreams DownstreamMap
 }
 
 func (app *App) Run() error {

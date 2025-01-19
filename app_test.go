@@ -27,9 +27,9 @@ func TestAppRuns(t *testing.T) {
 
 func TestAppLoadsWithConfigFileLocation(t *testing.T) {
 	app, err := joute.LoadAppWithConfigFrom(joute.ConfigFileLocation("./configs"))
-
 	assert.NoError(t, err)
 	assert.NotNil(t, app)
+
 	assert.Equal(t, 9000, app.Port)
 }
 

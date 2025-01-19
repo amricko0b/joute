@@ -2,10 +2,12 @@
     "port": 9000,
     "downstreams": {
         "legions": {
-            "address": "https://legions.svc"
+            "url": "https://legions.svc",
+            "timeout": "10s"
         },
         "primarchs": {
-            "address": "https://primarchs.svc:443"
+            "url": "https://primarchs.svc:443",
+            "timeout": "1m"
         }
     },
     "endpoints": {

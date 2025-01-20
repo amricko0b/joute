@@ -16,6 +16,6 @@ func TestEndpointsLoad(t *testing.T) {
 	assert.Contains(t, app.Endpoints, "/api/v1/primarch/jsonrpc")
 
 	endpoint := app.Endpoints["/api/v1/primarch/jsonrpc"]
-	assert.Equal(t, endpoint.RouteTo, "primarchs")
-	assert.Equal(t, endpoint.Routing, joute.RoutingDirect)
+	assert.Equal(t, endpoint.Config.RouteTo, "primarchs")
+	assert.Equal(t, endpoint.Config.Routing, joute.RoutingDirect)
 }

@@ -5,13 +5,18 @@ import (
 )
 
 type (
-	EndpointMap     map[string]*Endpoint
-	EndpointRouting string
+	EndpointMap       map[string]*Endpoint
+	EndpointConfigMap map[string]*EndpointConfig
+	EndpointRouting   string
 )
 
 // Endpoint is exported by Joute to client.
 // Client exchanges JSON-RPC messages with endpoint.
 type Endpoint struct {
+	Config *EndpointConfig
+}
+
+type EndpointConfig struct {
 	Routing EndpointRouting
 	RouteTo string
 }
@@ -32,7 +37,7 @@ func (endpoint *Endpoint) MakeHandlerFunc(app *App) http.HandlerFunc {
 			return
 		}
 
-		ds := app.Downstreams[endpoint.RouteTo]
+		ds := app.Downstreams[endpoint.Config.RouteTo]
 		if ds == nil {
 			http.Error(clientResponse, "Joute: no such downstream", http.StatusServiceUnavailable)
 			return
@@ -43,7 +48,7 @@ func (endpoint *Endpoint) MakeHandlerFunc(app *App) http.HandlerFunc {
 			downstreamError    error
 		)
 
-		switch endpoint.Routing {
+		switch endpoint.Config.Routing {
 		case RoutingDirect:
 			downstreamResponse, downstreamError = ds.CallDirect(clientRequest)
 		case RoutingUseMethod:

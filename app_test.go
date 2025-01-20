@@ -17,7 +17,7 @@ func TestAppRuns(t *testing.T) {
 	go app.Run()
 
 	isHttpServed := func() bool {
-		address := net.JoinHostPort("127.0.0.1", fmt.Sprintf("%d", app.Port))
+		address := net.JoinHostPort("127.0.0.1", fmt.Sprintf("%d", app.Config.Port))
 		_, err := net.DialTimeout("tcp", address, 3*time.Second)
 		return err == nil
 	}
@@ -30,7 +30,7 @@ func TestAppLoadsWithConfigFileLocation(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, app)
 
-	assert.Equal(t, 9000, app.Port)
+	assert.Equal(t, 9000, app.Config.Port)
 }
 
 func TestAppDoesNotLoadFromWorkingDirectoryDueToNoConfigFile(t *testing.T) {

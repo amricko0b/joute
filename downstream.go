@@ -9,15 +9,20 @@ import (
 )
 
 type (
-	DownstreamMap     map[string]*Downstream
-	DownstreamURL     url.URL
-	DownstreamTimeout time.Duration
+	DownstreamMap       map[string]*Downstream
+	DownstreamConfigMap map[string]*DownstreamConfig
+	DownstreamURL       url.URL
+	DownstreamTimeout   time.Duration
 )
 
 // Downstream is server behind Joute.
 // Each downstream may serve JSON-RPC API - thus Joute acts like simple gateway.
 // Each downstream may serve JSON API - thus Joute provides more complicated functions on adapting incoming requests and outgoing responses.
 type Downstream struct {
+	Config *DownstreamConfig
+}
+
+type DownstreamConfig struct {
 	URL     *DownstreamURL `json:"url"` // Only Scheme, Host and Path fields are specified
 	Timeout DownstreamTimeout
 }
@@ -25,11 +30,12 @@ type Downstream struct {
 // CallMethod calls downstream's method exported on dedicated endpoint (<downstream.URL>/<method>).
 // Target URL will be modified to change request direction
 func (d *Downstream) CallMethod(clientRequest *http.Request, method string) (*http.Response, error) {
-	cli := http.Client{Timeout: time.Duration(d.Timeout)}
+	cli := http.Client{Timeout: time.Duration(d.Config.Timeout)}
 
-	clientRequest.URL.Scheme = d.URL.Scheme
-	clientRequest.URL.Host = d.URL.Host
-	clientRequest.URL.Path = fmt.Sprintf("%s/%s", d.URL.Path, method)
+	u := d.Config.URL
+	clientRequest.URL.Scheme = u.Scheme
+	clientRequest.URL.Host = u.Host
+	clientRequest.URL.Path = fmt.Sprintf("%s/%s", u.Path, method)
 
 	// This is mandatory when proxying HTTP request to another server!
 	clientRequest.Host = ""
@@ -41,11 +47,12 @@ func (d *Downstream) CallMethod(clientRequest *http.Request, method string) (*ht
 // CallDirect calls downstream directly.
 // Target URL will be modified to change request direction
 func (d *Downstream) CallDirect(clientRequest *http.Request) (*http.Response, error) {
-	cli := http.Client{Timeout: time.Duration(d.Timeout)}
+	cli := http.Client{Timeout: time.Duration(d.Config.Timeout)}
 
-	clientRequest.URL.Scheme = d.URL.Scheme
-	clientRequest.URL.Host = d.URL.Host
-	clientRequest.URL.Path = d.URL.Path
+	u := d.Config.URL
+	clientRequest.URL.Scheme = u.Scheme
+	clientRequest.URL.Host = u.Host
+	clientRequest.URL.Path = u.Path
 
 	// This is mandatory when proxying HTTP request to another server!
 	clientRequest.Host = ""

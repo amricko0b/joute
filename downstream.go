@@ -2,6 +2,7 @@ package joute
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -17,15 +18,34 @@ type (
 // Each downstream may serve JSON-RPC API - thus Joute acts like simple gateway.
 // Each downstream may serve JSON API - thus Joute provides more complicated functions on adapting incoming requests and outgoing responses.
 type Downstream struct {
-	URL     *DownstreamURL `json:"url"` // Only Scheme and Host fields are specified
+	URL     *DownstreamURL `json:"url"` // Only Scheme, Host and Path fields are specified
 	Timeout DownstreamTimeout
 }
 
-func (d *Downstream) Call(clientRequest *http.Request) (*http.Response, error) {
+// CallMethod calls downstream's method exported on dedicated endpoint (<downstream.URL>/<method>).
+// Target URL will be modified to change request direction
+func (d *Downstream) CallMethod(clientRequest *http.Request, method string) (*http.Response, error) {
 	cli := http.Client{Timeout: time.Duration(d.Timeout)}
 
 	clientRequest.URL.Scheme = d.URL.Scheme
 	clientRequest.URL.Host = d.URL.Host
+	clientRequest.URL.Path = fmt.Sprintf("%s/%s", d.URL.Path, method)
+
+	// This is mandatory when proxying HTTP request to another server!
+	clientRequest.Host = ""
+	clientRequest.RequestURI = ""
+
+	return cli.Do(clientRequest)
+}
+
+// CallDirect calls downstream directly.
+// Target URL will be modified to change request direction
+func (d *Downstream) CallDirect(clientRequest *http.Request) (*http.Response, error) {
+	cli := http.Client{Timeout: time.Duration(d.Timeout)}
+
+	clientRequest.URL.Scheme = d.URL.Scheme
+	clientRequest.URL.Host = d.URL.Host
+	clientRequest.URL.Path = d.URL.Path
 
 	// This is mandatory when proxying HTTP request to another server!
 	clientRequest.Host = ""

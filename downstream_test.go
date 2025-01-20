@@ -34,7 +34,7 @@ func TestDownstreamsLoad(t *testing.T) {
 	assert.Equal(t, joute.DownstreamTimeout(1*time.Minute), primarchs.Timeout)
 }
 
-func TestDownstreamMayBeCalled(t *testing.T) {
+func TestDownstreamMayBeCalledDirectly(t *testing.T) {
 
 	srv := httptest.NewServer(http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
 		fmt.Fprint(resp, "Pong!")
@@ -50,7 +50,35 @@ func TestDownstreamMayBeCalled(t *testing.T) {
 		URL: (*joute.DownstreamURL)(addr), Timeout: joute.DownstreamTimeout(5 * time.Second),
 	}
 
-	resp, err := ds.Call(httptest.NewRequest(http.MethodPost, "http://pingpong.svc/", bytes.NewBufferString("Ping!")))
+	resp, err := ds.CallDirect(httptest.NewRequest(http.MethodPost, "http://pingpong.svc/", bytes.NewBufferString("Ping!")))
+	assert.NoError(t, err)
+
+	defer resp.Body.Close()
+	payload, err := io.ReadAll(resp.Body)
+	assert.NoError(t, err)
+	assert.Equal(t, "Pong!", string(payload))
+	assert.Equal(t, 200, resp.StatusCode)
+}
+
+func TestDownstreamMayBeCalledUsingMethod(t *testing.T) {
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/ping", func(resp http.ResponseWriter, req *http.Request) {
+		fmt.Fprint(resp, "Pong!")
+		resp.WriteHeader(200)
+	})
+
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+
+	addr, err := url.Parse(srv.URL)
+	assert.NoError(t, err)
+
+	ds := joute.Downstream{
+		URL: (*joute.DownstreamURL)(addr), Timeout: joute.DownstreamTimeout(5 * time.Second),
+	}
+
+	resp, err := ds.CallMethod(httptest.NewRequest(http.MethodPost, "http://pingpong.svc/", bytes.NewBufferString("Ping!")), "ping")
 	assert.NoError(t, err)
 
 	defer resp.Body.Close()

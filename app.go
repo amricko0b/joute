@@ -10,9 +10,15 @@ import (
 type App struct {
 	Port        int
 	Downstreams DownstreamMap
+	Endpoints   EndpointMap
 }
 
 func (app *App) Run() error {
+
+	for path, endpoint := range app.Endpoints {
+		http.HandleFunc(path, endpoint.MakeHandlerFunc(app))
+	}
+
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", app.Port), nil); err != nil {
 		return err
 	}
